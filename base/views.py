@@ -16,6 +16,7 @@ from django.db import transaction
 
 from .models import Task
 from .forms import PositionForm
+from django import forms
 
 
 class CustomLoginView(LoginView):
@@ -72,18 +73,37 @@ class TaskDetail(LoginRequiredMixin, DetailView):
 
 class TaskCreate(LoginRequiredMixin, CreateView):
     model = Task
-    fields = ['title', 'description', 'complete']
+    form_class: PositionForm
+    fields = ['title', 'description', 'date' , 'complete']
+
     success_url = reverse_lazy('tasks')
 
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super(TaskCreate, self).form_valid(form)
 
+    def get_form(self, form_class=None):
+
+        if form_class is None: 
+            form_class = self.form_class
+        form = super(TaskCreate, self).get_form(form_class)
+        form.fields['date'].widget = forms.DateTimeInput(attrs={'type': 'datetime-local'})
+        return form
+
 
 class TaskUpdate(LoginRequiredMixin, UpdateView):
     model = Task
-    fields = ['title', 'description', 'complete']
+    fields = ['title', 'description', 'date' , 'complete']
     success_url = reverse_lazy('tasks')
+    form_class: PositionForm
+
+    def get_form(self, form_class=None):
+
+        if form_class is None: 
+            form_class = self.form_class
+        form = super(TaskUpdate, self).get_form(form_class)
+        form.fields['date'].widget = forms.DateTimeInput(attrs={'type': 'datetime-local'})
+        return form
 
 
 class DeleteView(LoginRequiredMixin, DeleteView):
