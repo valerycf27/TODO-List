@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>To-Do List reCAPTCHA</title>
+</head>
+
+<body>
+    <h2 style="color: red;">### Welcome to the best To-Do List Web Application ever ###</h2>
+    <p>Please verify that you are not a robot by checking the reCAPTCHA below</p>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+</body>
+
+</html>

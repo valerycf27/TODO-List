@@ -39,16 +39,42 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'base.apps.BaseConfig',
     'django_extensions',
+
+    # Apps for adding reCaptcha to the homepage
+    'contact',
+    'captcha',
+
+    # Apps for two-factor-authentication
+    'django_otp',
+    'django_otp.plugins.otp_totp'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    
+    # Activate the CSRF middleware to secure the application againts Cross site request forgery (CSRF) attacks 
     'django.middleware.csrf.CsrfViewMiddleware',
+
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
+    'django_otp.middleware.OTPMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',#
+    
+    # This middleware protects the application from clickjacking attacks.
+    # This is done by setting a header called "X-Frame-Options HTTP header" is all HTTP responses sent by the web server.
+    # The X-Frame-Options HTTP header indicates whether or not a resource is allowed 
+    # to load within a frame or iframe. If the response contains the header with a value of SAMEORIGIN, 
+    # then the browser will only load the resource in a frame if the request originated from the same site. 
+    # If the header is set to DENY then the browser will block the resource from loading in a frame 
+    # no matter which site made the request.
+    # By defautl, this middleware sets the X-Frame-Options header to DENY for every outgoing HttpResponse.
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
+    # This middleware provides several security enhancements to the request/response cycle of the web application.
+    # The security features provided by this middleware are enabled below.
+    'django.middleware.security.SecurityMiddleware',
+
 ]
 
 ROOT_URLCONF = 'todo_list.urls'
@@ -121,3 +147,36 @@ LOGIN_URL = 'login'
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+RECAPTCHA_PUBLIC_KEY = '6LdqbggjAAAAAKyxPQu2F0GMO4IlqJnqiVWyOKsM'
+
+RECAPTCHA_PRIVATE_KEY = '6LdqbggjAAAAAIM5rq3BXEBNkciscj77JGAIaLaD'
+
+
+# Enable security features provided by the SecurityMiddleware.
+# Note that the HTTPS protocol should have to be set up first before enabling the following settings.
+# Ensure that CSRF cookies are always sent over HTTPS and avoid transmitting them over HTTP accidentally
+# CSRF_COOKIE_SECURE = True
+
+# Ensure that session cookies are always sent over HTTPS and avoid transmitting them over HTTP accidentally
+# SESSION_COOKIE_SECURE = True
+
+# Set the X-Content-Type-Options nosniff header on all responses to prevent the browser from guessing 
+# the content type of the assets it fetches and force it to always use the type provided in the Content-Type header.
+# This can, for example, helps preventing hackers from executing malicious code on the web server.
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Set the Cross-Origin Opener Policy header on all responses to prevent cross-origin attacks.
+# SECURE_CROSS_ORIGIN_OPENER_POLICY = same_origin
+
+# Ensure that all subdomains used in the web server are only accessed over HTTPS 
+# (see HTTP Strict Transport Security in the Django Documentation).
+# This helps protecting the web server from man-in-the-middle (MITM) attacks.
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
+# Prevent the web server from communicating with other domains via insecure connections (e.g., HTTP)
+# for one year (the time unit here is seconds).
+SECURE_HSTS_SECONDS = 31536000
+
+# Redirect all non-HTTPS requests to HTTPS
+# SECURE_SSL_REDIRECT = True
