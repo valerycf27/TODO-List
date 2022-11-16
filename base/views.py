@@ -3,6 +3,7 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.urls import reverse_lazy
+from django import forms
 
 from django.contrib.auth.views import LoginView
 # LoginRequiredMixin allows us to protect our views from being accessed without a login.
@@ -92,9 +93,9 @@ class TaskDetail(LoginRequiredMixin, DetailView):
 
 class TaskCreate(LoginRequiredMixin, CreateView):
     model = Task
-
+    form_class: PositionForm
     # Let the user only see the form fields that he should be able to interact with
-    fields = ['title', 'description', 'complete']
+    fields = ['title', 'description', 'date' , 'complete']
 
     # If an item was created successfully, redirect the user to the tasks homepage
     success_url = reverse_lazy('tasks')
@@ -104,12 +105,30 @@ class TaskCreate(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super(TaskCreate, self).form_valid(form)
+        
+    def get_form(self, form_class=None):
+
+        if form_class is None: 
+            form_class = self.form_class
+        form = super(TaskCreate, self).get_form(form_class)
+        form.fields['date'].widget = forms.DateTimeInput(attrs={'type': 'datetime-local'})
+        return form
 
 
 class TaskUpdate(LoginRequiredMixin, UpdateView):
     model = Task
-    fields = ['title', 'description', 'complete']
+    fields = ['title', 'description', 'date' , 'complete']
     success_url = reverse_lazy('tasks')
+
+    form_class: PositionForm
+
+    def get_form(self, form_class=None):
+
+        if form_class is None: 
+            form_class = self.form_class
+        form = super(TaskUpdate, self).get_form(form_class)
+        form.fields['date'].widget = forms.DateTimeInput(attrs={'type': 'datetime-local'})
+        return form
 
 
 class DeleteView(LoginRequiredMixin, DeleteView):
@@ -132,3 +151,10 @@ class TaskReorder(View):
 
         return redirect(reverse_lazy('tasks'))
 
+def get_form(self, form_class=None):
+
+        if form_class is None: 
+            form_class = self.form_class
+        form = super(TaskCreate, self).get_form(form_class)
+        form.fields['date'].widget = forms.DateTimeInput(attrs={'type': 'datetime-local'})
+        return form

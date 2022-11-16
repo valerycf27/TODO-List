@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django import forms
 # Create your models here.
 
 
@@ -19,6 +20,9 @@ class Task(models.Model):
     # A text field for the description of the task.
     description = models.TextField(null=True, blank=True)
     
+    #A datePicker to mark the date and time.
+    date = models.DateTimeField()
+
     # Checkbox to mark an item as completed.
     complete = models.BooleanField(default=False)
     
